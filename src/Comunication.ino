@@ -37,6 +37,7 @@ void CheckCommand(){
           speedMotor = MAX_SPEED;
         }
         saveVarMotor();
+        
         DEBUG("OK,"+String(speedMotor));
       }
     break;
