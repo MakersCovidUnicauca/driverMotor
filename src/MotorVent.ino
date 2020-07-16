@@ -33,8 +33,8 @@ intended publication of this material.
 #include "Definitions.h"
 
 #define refDistance -70.0 * PulseXmm
-#define refSpeed 100.0 * PulseXmm
-#define refAccel 100.0 * PulseXmm
+#define refSpeed 10.0 * PulseXmm
+#define refAccel 10.0 * PulseXmm
 
 void refMotor()
 {
@@ -42,35 +42,35 @@ void refMotor()
   digitalWrite(STEPPER1_ENA_PIN, LOW); //
 
 #ifdef InitSensorEnable
-  DEBUG("Searching position ");
-  Motor.setCurrentPosition(0);
-  DEBUG(GetPosition());
+  //DEBUG("Searching position ");
+  setCurrentPositionM(0);
+  //DEBUG(GetPosition());
   SetMotor(refDistance, refSpeed, refAccel);
   //Search Initial Position
   while (digitalRead(OPTICAL_SENSOR_0) != HIGH)
   {
-    Motor.run();
+    RunMotor();
     delay(1);
   }
   InitMotor(INITPOSITION); //Define 0 position
-  DEBUG("Entering back ");
+  //DEBUG("Entering back ");
   // go to initial position + 5
-  SetMotor(BACKINITPOS, refSpeed, refAccel);
-  while (Motor.isRunning() > 0)
+  SetMotor(500, refSpeed, refAccel);
+  while (MotorRuning > 0)
   {
-    Motor.run();
+    RunMotor();
     delay(1);
   }
 #ifdef __DEBG__
-  DEBUG("Got position ");
-  Serial.println(GetPosition());
+  //DEBUG("Got position ");
+  //Serial.println(GetPosition());
 #endif
   //return to Initial position
-  SetMotor(INITPOSITION - 5, refSpeed / 10.0, refAccel / 10.0);
-  DEBUG("Setting again ");
+  SetMotor(INITPOSITION, refSpeed / 2, refAccel / 2);
+  DEBUG1("OK,00");
   while (digitalRead(OPTICAL_SENSOR_0) != HIGH)
   {
-    Motor.run();
+    RunMotor();
     delay(1);
   }
   InitMotor(INITPOSITION); //Define 0 position
@@ -82,7 +82,7 @@ void refMotor()
     delay(1000);
     DEBUG("waiting position ");
   }
-  InitMotor(); //Define 60 position
+  InitMotor(INITPOSITION); //Define 60 position
   Serial.println(GetPosition());
 #endif
 // Enable Motor
@@ -107,7 +107,7 @@ digitalWrite(STEPPER1_ENA_PIN, LOW); //Serial.println
 long GetPosition()
 {
   long positionMotor = 0;
-  positionMotor = Motor.currentPosition();
+  positionMotor = currentPositionM();
   return positionMotor;
 }
 
@@ -123,9 +123,10 @@ long GetPosition()
 * NOTE:
 * 
 *****************************************************************************/
-void InitMotor(float Init_position)
+void InitMotor(long Init_position)
 {
-  Motor.setCurrentPosition(Init_position * PulseXmm);
+  setCurrentPositionM(Init_position );
+  
 }
 
 /*F**************************************************************************
@@ -143,13 +144,13 @@ void InitMotor(float Init_position)
 * NOTE:
 * 
 *****************************************************************************/
-void SetMotor(long Distance, float speedM, float accel)
+void SetMotor(long Distance, long speedM, long accel)
 {
   digitalWrite(STEPPER1_ENA_PIN, LOW); //Deshabilitar Motor
   long DistanceValue = (long)Distance ;
-  Motor.setMaxSpeed(speedM );
-  Motor.setAcceleration(accel );
-  Motor.moveTo(DistanceValue);  
+  setMaxSpeedM(speedM );
+  setAccelerationM(accel );
+  MotorMoveTo(DistanceValue);  
 }
 
 /*F**************************************************************************
@@ -166,43 +167,54 @@ void SetMotor(long Distance, float speedM, float accel)
 *****************************************************************************/
 void updateMotorPos()
 {
-  int dist = (int)GetPosition();
+  long dist = GetPosition();
   if (mPosCurrent != dist)
   {
     if(CheckAlarm){
       if(dist <= AlarmPos){
-        DEBUG("A"+String(AlarmPos));
+        DEBUG1("A,"+String(AlarmPos));
         CheckAlarm = 0;
       }
     }
     String stringone = "Dist:";
     stringone = stringone + String(dist);
     mPosCurrent = dist;
-    if(Motor.isRunning() == 0){
+    if(MotorRuning == 0){
       if(CheckPos){
         CheckPos = 0;
         if(refZero){
           refZero = 0;
           RefZeroMotor();
-          digitalWrite(STEPPER1_ENA_PIN, HIGH); //Deshabilitar Motor
+    
         }
-        DEBUG("ACK");
+        DEBUG1("ACK,1");
       }
-
-      
-    }
+      }
+      else{
+        if(refZero){
+           if(digitalRead(OPTICAL_SENSOR_0) == HIGH){
+            refZero = 0;
+            stopMotor();
+            setCurrentPositionM(INITPOSITION); //Define 0 position
+            DEBUG1("ACK,1");
+          }
+        }
+      }
+    
   }
 }
 
 
 
 void RefZeroMotor(){
-   SetMotor(refDistance, refSpeed, refAccel);
-  //Search Initial Position
-  while (digitalRead(OPTICAL_SENSOR_0) != HIGH)
-  {
-    Motor.run();
-    delayMicroseconds(50);
-  }
-  InitMotor(INITPOSITION); //Define 0 position
+  if(digitalRead(OPTICAL_SENSOR_0) != HIGH){
+    MotorMoveTo(refDistance);
+    //Search Initial Position
+    while (digitalRead(OPTICAL_SENSOR_0) != HIGH)
+    {
+      RunMotor();
+      delayMicroseconds(50);
+    }
+    setCurrentPositionM(INITPOSITION); //Define 0 position
+    }    
 }

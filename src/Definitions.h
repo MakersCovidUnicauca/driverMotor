@@ -11,6 +11,8 @@
 #include "PinOutMotor.h"
 //Parametros mecanicos
 #include "MechanicalDefinitions.h"
+//New Library Motor
+#include "MotorDriver.h"
 
 #define AddresI2C   0x08
 byte SlaveReceived = 0;
@@ -28,9 +30,13 @@ String TestString;
 #define DEBUG(a)  TestString = String(a);
 #endif
 
+#define DEBUG1(a)            \
+    Serial.println(a);
+
+
 // Var Motor
-float accelMotor = 1000;
-float speedMotor = 500; 
+long accelMotor = 1000;
+long speedMotor = 1000; 
 long AlarmPos = 1000;
 
 boolean CheckAlarm = 0;
@@ -52,7 +58,10 @@ String msg2Web;
 void refMotor(); 
 long GetPosition();
 void updateMotorPos();
-void SetMotor(long Distance, float speedM, float accel);
+void SetMotor(long Distance, long speedM, long accel);
+
+
+
 
 // Comunication
 String inputString = "";         // a String to hold incoming data

@@ -18,50 +18,66 @@ void CheckCommand(){
   if (stringComplete) {
     stringComplete = false;
     char command = inputString[0];
-    int nextPos = 0;
+    long nextPos = 0;
+    boolean result = 0;
     switch (command)
     {
     case 'A':  // Reportar alarma
       inputString[0] = '0';
-      if(CheckString(inputString)){
+      result = CheckStringIn();
+        if(result){
         AlarmPos = inputString.toInt();
+        if(AlarmPos > 6700){
+           AlarmPos = 6700;
+          }
         CheckAlarm = 1;
-        DEBUG("OK,"+String(AlarmPos));
+        DEBUG1("OK,"+String(AlarmPos));
       }
     break;
     case 'V': // Definir velocidad
       inputString[0] = '0';
-      if(CheckString(inputString)){
+      result = CheckStringIn();
+        if(result){
         speedMotor  = inputString.toInt();
         if(speedMotor > MAX_SPEED){
           speedMotor = MAX_SPEED;
         }
+        setMaxSpeedM(speedMotor);
         saveVarMotor();
         
-        DEBUG("OK,"+String(speedMotor));
+        DEBUG1("OK,"+String(speedMotor));
       }
     break;
     case 'B': // Definir Aceleracion
       inputString[0] = '0';
-      if(CheckString(inputString)){
+      result = CheckStringIn();
+        if(result){
         accelMotor  = inputString.toInt();
         if(accelMotor > MAX_ACCEL){
           accelMotor = MAX_ACCEL;
         }
         saveVarMotor();
-        DEBUG("OK,"+String(accelMotor));
+        DEBUG1("OK,"+String(accelMotor));
       }
     break;
     case 'S': // Detener motor
-        Motor.stop();
-        DEBUG("OK,STOP");
+        stopMotor();
+        DEBUG1("OK,STOP");
     break;
     case 'Q': // Consultar posicion
-        DEBUG("D,"+String(GetPosition()));
+        DEBUG1("D,"+String(GetPosition()));
+    break;
+    case 'E': // Consultar posicion
+        DEBUG1("E,"+String(targetSpeed)+","+String(delayMicrosMotor));
+    break;
+    case 'R': // Consultar posicion
+        refMotor(); //busca el sensor optico  solo inicio
+        DEBUG1("R,0");
     break;
     case 'P': //Fijar Posicion
         inputString[0] = '0';
-        if(CheckString(inputString)){
+        result = CheckStringIn();
+        if(result){
           nextPos  = inputString.toInt();
           if(nextPos > 6700){
             nextPos = 6700;
@@ -69,15 +85,15 @@ void CheckCommand(){
           if(nextPos == 0){
             refZero = 1;
           }
-          SetMotor(nextPos, speedMotor, accelMotor);
+          MotorMoveTo(nextPos);
           CheckPos = 1;
-          DEBUG("OK,"+String(nextPos));
+          DEBUG1("OK,"+String(nextPos));
         }
         
     break;
     
     default:
-        DEBUG("NACK");
+        DEBUG1("NACK,0");
     break;
     }
     inputString = "";
@@ -107,10 +123,12 @@ void serialEvent() {
 }
 
 
-boolean CheckString(String str){
- for(byte i=0; i< str.length();i++){
-   if( !isDigit(str[i])) {
-    //Serial.println("Not digit");
+boolean CheckStringIn(){
+ //DEBUG("Check "+ inputString +" "+ String(inputString.length()));
+ byte stringLength = inputString.length()-2;
+ for(byte i=0; i< stringLength;i++){
+   if( inputString[i]<'0' || inputString[i] > '9' ) {
+    //DEBUG("Not digit ");
     return false;
     }
   }

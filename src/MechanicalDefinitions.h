@@ -5,14 +5,11 @@
 
 ///////////////////////////////////   Stepper Motor
 //////////////////////////////////////////////////
-
-#include <AccelStepper.h>
 // The X Stepper pins
 #define PulsePerRev 8000
 #define mmPerRev 72
 #define mmPerPulse 0.009
 #define PulseXmm 111.111
-
 #define DelayPulse 220 // millisecond
 #define LONG_FUELLE 60 //milimetros (mm)
 #define RELMMVOL 17.67
@@ -43,6 +40,5 @@ float DistMotor = DIST_MOTOR;
 float VelMotor = VEL_MOTOR;    // mm/s
 float AcelMotor = ACCEL_MOTOR; // mm/s2
 
-AccelStepper Motor(AccelStepper::DRIVER, STEPPER1_STEP_PIN, STEPPER1_DIR_PIN);
 
 #endif

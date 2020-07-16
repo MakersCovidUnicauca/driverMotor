@@ -19,7 +19,7 @@ void setup()
   pinMode(STEPPER1_DIR_PIN, OUTPUT);
   pinMode(STEPPER1_ENA_PIN, OUTPUT);
   //directionInvert,stepInvert,enableInvert
-  Motor.setPinsInverted(true, false,false);
+  //Motor.setPinsInverted(true, false,false);
   //Optical Sensor
   pinMode(OPTICAL_SENSOR_0, INPUT_PULLUP);
   pinMode(OPTICAL_SENSOR_1, INPUT_PULLUP);
@@ -34,7 +34,7 @@ void setup()
   // Motor Conf
   DEBUG("Serching Motor");
   refMotor(); //busca el sensor optico  solo inicio
-  DEBUG("Finish Motor");
+  //DEBUG("Finish Motor");
 }
 
 void loop()
@@ -42,7 +42,7 @@ void loop()
   // indica la posicion via Serial
   updateMotorPos();
   //Funcion para actualizacion de pasos del motor
-  Motor.run();
+  RunMotor();
 
   //serial Events
   serialEvent();
@@ -65,7 +65,7 @@ void VolumenData(){
           int VolumenUser = volUser[i];
           msg2Web += "," + String(VolumenUser);
         }
-      DEBUG(msg2Web);
+      DEBUG1(msg2Web);
     }
     previousMillis = currentMillis;
   }
