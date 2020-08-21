@@ -42,6 +42,7 @@ long AlarmPos = 1000;
 boolean CheckAlarm = 0;
 boolean CheckPos = 0;
 boolean refZero = 0;
+boolean sendPosition = 0;
 
 
 unsigned long previousMillis = 0;        // will store last time LED was updated
