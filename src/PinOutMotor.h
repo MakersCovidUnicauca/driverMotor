@@ -20,6 +20,7 @@
 #define OPTICAL_SENSOR_0 36     // Finales de carrera posicion 0
 #define OPTICAL_SENSOR_1 39     // Finales de carrera posicion fin
 
+#define CNY70_SENSOR 14
 
 #endif
 

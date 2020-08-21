@@ -23,7 +23,7 @@ void setup()
   //Optical Sensor
   pinMode(OPTICAL_SENSOR_0, INPUT_PULLUP);
   pinMode(OPTICAL_SENSOR_1, INPUT_PULLUP);
-
+  pinMode(CNY70_SENSOR,INPUT_PULLUP);
   //Disable motor
   digitalWrite(INBUILD_LED,HIGH);
   digitalWrite(STEPPER1_ENA_PIN, HIGH); //Deshabilitar Motor
@@ -65,7 +65,14 @@ void VolumenData(){
           int VolumenUser = volUser[i];
           msg2Web += "," + String(VolumenUser);
         }
-      DEBUG1(msg2Web);
+      if(sendPosition){
+        DEBUG1(msg2Web);
+      } 
+      else{
+         DEBUG1("D,"+String(GetPosition()));
+      } 
+      
+     
     }
     previousMillis = currentMillis;
   }
